@@ -24,6 +24,10 @@ if (git status --porcelain) {
   Write-Host "    Đã commit: $Message"
 }
 git pull --rebase origin main
+if ($LASTEXITCODE -ne 0) {
+  Write-Host 'Không lấy được thay đổi từ GitHub (xung đột hoặc mất mạng) – CHƯA đẩy lên.' -ForegroundColor Red
+  exit 1
+}
 
 Write-Host '2/3 Kiểm tra build (tránh đẩy code lỗi làm hỏng web trên Vercel)...' -ForegroundColor Cyan
 npm run build --silent
@@ -34,4 +38,8 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host '3/3 Đẩy lên GitHub...' -ForegroundColor Cyan
 git push origin main
+if ($LASTEXITCODE -ne 0) {
+  Write-Host 'Đẩy lên GitHub THẤT BẠI (chưa đăng nhập GitHub hoặc mất mạng). Commit vẫn nằm trên máy, chạy lại npm run sync sau.' -ForegroundColor Red
+  exit 1
+}
 Write-Host 'Xong! Vercel sẽ tự triển khai bản mới sau khoảng 1 phút.' -ForegroundColor Green
