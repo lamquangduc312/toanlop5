@@ -29,7 +29,12 @@ if ($LASTEXITCODE -ne 0) {
   exit 1
 }
 
-Write-Host '2/3 Kiểm tra build (tránh đẩy code lỗi làm hỏng web trên Vercel)...' -ForegroundColor Cyan
+Write-Host '2/3 Kiểm tra dữ liệu đề thi và build (tránh đẩy lỗi làm hỏng web trên Vercel)...' -ForegroundColor Cyan
+npm run check --silent
+if ($LASTEXITCODE -ne 0) {
+  Write-Host 'Dữ liệu đề thi có LỖI (xem danh sách ở trên) – CHƯA đẩy lên GitHub.' -ForegroundColor Red
+  exit 1
+}
 npm run build --silent
 if ($LASTEXITCODE -ne 0) {
   Write-Host 'Build lỗi – CHƯA đẩy lên GitHub. Sửa lỗi rồi chạy lại.' -ForegroundColor Red

@@ -8,6 +8,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
+    "check": "node scripts/check-data.mjs",
     "sync": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sync.ps1"
   },
   "dependencies": {

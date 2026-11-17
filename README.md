@@ -43,13 +43,10 @@ src/
     QuestionCard, Timer, ResultView, StatsDashboard, ProgressBar, TopicIcon
 ```
 
-## Thêm câu hỏi
+## Thêm đề thi / câu hỏi mới
 
-Mở `src/mockData.ts`, thêm vào mảng `QUESTIONS` bằng các hàm có sẵn, ví dụ:
+👉 Xem kịch bản chi tiết: **[docs/THEM-DE-MOI.md](docs/THEM-DE-MOI.md)**
 
-```ts
-DT.input('dt99', '4 ha = … m²', '40000', '4 × 10 000 = 40 000 m².', 'Đề cô giao', 'm²'),
-SS.mc('ss99', 'Số lớn nhất là:', ['1,9', '1,09', '1,99', '1,909'], 2, 'So hàng phần trăm…', 'Đề cô giao'),
-```
-
-Muốn câu đó có trong đề nào thì thêm `id` của nó vào `questionIds` của đề trong `EXAMS`.
+Tóm tắt:
+- `npm.cmd run check`: kiểm tra dữ liệu và cho biết mã câu mới tiếp theo của từng chủ đề.
+- `npm.cmd run sync -- "lời nhắn"`: kiểm tra, build rồi đẩy lên GitHub. Vercel tự cập nhật web.
