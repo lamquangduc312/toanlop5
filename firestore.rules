@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Ứng dụng gia đình, không đăng nhập: chỉ cho phép đọc và THÊM bài làm của đúng học sinh,
+    // không cho sửa / xoá. Nếu public website, nên bật Firebase Auth và siết lại quy tắc.
+    match /attempts/{attemptId} {
+      allow read: if resource.data.studentId == 'lam-ha-ngan-5a7';
+      allow create: if request.resource.data.studentId == 'lam-ha-ngan-5a7'
+                    && request.resource.data.score10 is number
+                    && request.resource.data.score10 >= 0
+                    && request.resource.data.score10 <= 10;
+      allow update, delete: if false;
+    }
+  }
+}
