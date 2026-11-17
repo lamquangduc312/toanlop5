@@ -2,6 +2,8 @@
 
 Web app ôn thi giữa kì I Toán lớp 5 cho bé **Lâm Hà Ngân – lớp 5A7, Trường Tiểu học Đại Kim**.
 
+👉 **Vào học tại: https://chuyentoanlop5.vercel.app/**
+
 - **Học theo chủ đề** (8 chủ đề): mỗi lượt 10 câu, chấm ngay từng câu, có hướng dẫn giải; câu sai lần trước được hỏi lại trước.
 - **Làm cả đề 40 phút**: 13 đề lấy từ tài liệu và 1 đề ngẫu nhiên. Có đồng hồ đếm ngược, hết giờ tự nộp, điểm quy về thang 10.
 - **Thống kê**: số lượt làm, điểm trung bình, mức thành thạo từng chủ đề, gợi ý chủ đề cần ôn, ôn lại các câu còn sai.
