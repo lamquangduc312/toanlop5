@@ -77,7 +77,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-sky-50">
+    <div className="min-h-screen">
       <Header tab={tab} onTab={(t) => goHome(t)} showNav={screen.kind === 'home'} dataSource={dataSource} />
 
       <main className="mx-auto max-w-5xl px-4 py-6">
@@ -117,8 +117,8 @@ export default function App() {
         )}
       </main>
 
-      <footer className="pb-8 text-center text-xs text-slate-400">
-        Ngân hàng câu hỏi tổng hợp từ 21 đề kiểm tra giữa kì I – Toán 5 · Chúc Hà Ngân thi thật tốt!
+      <footer className="pb-8 text-center text-sm text-slate-400">
+        📚 Câu hỏi tổng hợp từ 21 đề kiểm tra giữa kì I – Toán 5 · Chúc Hà Ngân thi thật tốt! 💖
       </footer>
     </div>
   );

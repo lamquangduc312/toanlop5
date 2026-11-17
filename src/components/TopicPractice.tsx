@@ -1,5 +1,6 @@
 import { ArrowRight, CheckCheck, ChevronLeft, Flag } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { TOPICS } from '../mockData';
 import { buildAttempt, isCorrect } from '../lib/grading';
 import type { Attempt, QuizSession } from '../types';
 import ProgressBar from './ProgressBar';
@@ -24,10 +25,11 @@ export default function TopicPractice({ session, onFinish, onExit }: Props) {
   const isLast = index === session.questions.length - 1;
   const correctSoFar = session.questions.filter((x) => checked[x.id] && isCorrect(x, answers[x.id])).length;
   const checkedCount = Object.keys(checked).length;
+  const topic = session.mode === 'topic' ? TOPICS.find((t) => t.id === session.refId) : undefined;
 
-  const finish = (finalChecked = checked) => {
+  const finish = () => {
     // Chỉ chấm các câu đã làm (bé có thể dừng giữa chừng)
-    const done = { ...session, questions: session.questions.filter((x) => finalChecked[x.id]) };
+    const done = { ...session, questions: session.questions.filter((x) => checked[x.id]) };
     if (done.questions.length === 0) return onExit();
     onFinish(buildAttempt(done, answers, Math.round((Date.now() - startedAt.current) / 1000)));
   };
@@ -45,19 +47,26 @@ export default function TopicPractice({ session, onFinish, onExit }: Props) {
   return (
     <section className="mx-auto max-w-3xl space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <button onClick={() => (checkedCount ? finish() : onExit())} className="inline-flex items-center gap-1 font-bold text-slate-500 hover:text-slate-800">
+        <button onClick={() => (checkedCount ? finish() : onExit())} className="btn btn-white px-3 py-2 text-base">
           <ChevronLeft className="h-5 w-5" /> {checkedCount ? 'Dừng & xem kết quả' : 'Quay lại'}
         </button>
-        <span className="rounded-full bg-emerald-100 px-3 py-1 text-sm font-bold text-emerald-700">
-          Đúng {correctSoFar}/{checkedCount}
+        <span className="chip bg-white px-3 py-1.5 font-display text-base font-bold text-emerald-600 ring-2 ring-emerald-100">
+          ⭐ Đúng {correctSoFar}/{checkedCount}
         </span>
       </div>
 
-      <div>
-        <h1 className="text-xl font-extrabold text-slate-800">{session.title}</h1>
-        <div className="mt-2 flex items-center gap-3 text-sm text-slate-500">
-          <ProgressBar value={(index + (isChecked ? 1 : 0)) / session.questions.length} />
-          <span className="shrink-0 font-bold">
+      <div className="card p-4">
+        <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-800">
+          <span aria-hidden>{topic?.emoji ?? '🔁'}</span>
+          {topic?.name ?? session.title}
+        </h1>
+        <div className="mt-2 flex items-center gap-3">
+          <ProgressBar
+            value={(index + (isChecked ? 1 : 0)) / session.questions.length}
+            colorClass={topic?.bar ?? 'bg-gradient-to-r from-pink-400 to-orange-400'}
+            className="h-4"
+          />
+          <span className="shrink-0 font-display text-lg font-bold text-slate-600">
             {index + 1}/{session.questions.length}
           </span>
         </div>
@@ -77,25 +86,18 @@ export default function TopicPractice({ session, onFinish, onExit }: Props) {
 
       <div className="flex justify-end">
         {!isChecked ? (
-          <button
-            onClick={check}
-            disabled={!value.trim()}
-            className="inline-flex items-center gap-2 rounded-xl bg-pink-500 px-6 py-3 text-lg font-extrabold text-white hover:bg-pink-600 disabled:cursor-not-allowed disabled:bg-slate-300"
-          >
-            <CheckCheck className="h-5 w-5" /> Kiểm tra
+          <button onClick={check} disabled={!value.trim()} className="btn btn-pink px-8 py-3 text-xl">
+            <CheckCheck className="h-6 w-6" /> Kiểm tra
           </button>
         ) : (
-          <button
-            onClick={next}
-            className="inline-flex items-center gap-2 rounded-xl bg-indigo-500 px-6 py-3 text-lg font-extrabold text-white hover:bg-indigo-600"
-          >
+          <button onClick={next} className="btn btn-indigo px-8 py-3 text-xl">
             {isLast ? (
               <>
-                <Flag className="h-5 w-5" /> Xem kết quả
+                <Flag className="h-6 w-6" /> Xem kết quả
               </>
             ) : (
               <>
-                Câu tiếp theo <ArrowRight className="h-5 w-5" />
+                Câu tiếp theo <ArrowRight className="h-6 w-6" />
               </>
             )}
           </button>

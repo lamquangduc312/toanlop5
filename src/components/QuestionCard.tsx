@@ -1,4 +1,3 @@
-import { CheckCircle2, Lightbulb, XCircle } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { TOPICS } from '../mockData';
 import { OPTION_LETTERS, correctAnswerText, isCorrect, questionPoints, userAnswerText } from '../lib/grading';
@@ -17,6 +16,21 @@ interface Props {
   autoFocus?: boolean;
 }
 
+const LETTER_STYLES = [
+  'bg-sky-100 text-sky-700',
+  'bg-violet-100 text-violet-700',
+  'bg-amber-100 text-amber-800',
+  'bg-emerald-100 text-emerald-700',
+];
+
+const PRAISES = ['🎉 Chính xác! Giỏi quá!', '🌟 Đúng rồi! Tuyệt vời!', '👏 Hay lắm, Hà Ngân!', '🚀 Quá đỉnh! Làm tiếp nào!', '💯 Chuẩn luôn!'];
+
+/** Chọn lời khen cố định theo câu hỏi để không đổi khi giao diện vẽ lại */
+function praiseFor(id: string) {
+  const sum = [...id].reduce((s, ch) => s + ch.charCodeAt(0), 0);
+  return PRAISES[sum % PRAISES.length];
+}
+
 export default function QuestionCard({ question: q, index, value, onChange, locked, showFeedback, onEnter, autoFocus }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const topic = TOPICS.find((t) => t.id === q.topicId);
@@ -27,40 +41,48 @@ export default function QuestionCard({ question: q, index, value, onChange, lock
   }, [autoFocus, q.id, q.type, locked]);
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="mb-3 flex flex-wrap items-center gap-2 text-xs font-bold">
-        <span className="rounded-full bg-slate-800 px-2.5 py-0.5 text-white">Câu {index + 1}</span>
-        {topic && <span className={`rounded-full px-2.5 py-0.5 ${topic.accent}`}>{topic.name}</span>}
-        <span className="text-slate-400">{questionPoints(q).toLocaleString('vi-VN')} điểm</span>
+    <div className="card p-5 sm:p-6">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <span className="rounded-xl bg-slate-800 px-3 py-1 font-display text-base font-bold text-white">Câu {index + 1}</span>
+        {topic && (
+          <span className={`chip ${topic.accent}`}>
+            {topic.emoji} {topic.name}
+          </span>
+        )}
+        <span className="chip bg-amber-50 text-amber-700">⭐ {questionPoints(q).toLocaleString('vi-VN')} điểm</span>
       </div>
 
-      <p className="whitespace-pre-line text-lg font-semibold leading-relaxed text-slate-800">{q.prompt}</p>
+      <p className="whitespace-pre-line text-xl font-medium leading-relaxed text-slate-800">{q.prompt}</p>
 
       {q.type === 'mc' ? (
-        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
           {q.options.map((opt, i) => {
             const selected = value === String(i);
             let cls = 'border-slate-200 bg-white hover:border-pink-300 hover:bg-pink-50';
-            if (selected) cls = 'border-pink-500 bg-pink-50 ring-2 ring-pink-200';
-            if (showFeedback && i === q.answer) cls = 'border-emerald-500 bg-emerald-50 ring-2 ring-emerald-200';
-            else if (showFeedback && selected) cls = 'border-red-400 bg-red-50 ring-2 ring-red-200';
+            if (selected) cls = 'border-pink-400 bg-pink-50 ring-4 ring-pink-100';
+            if (showFeedback && i === q.answer) cls = 'border-emerald-400 bg-emerald-50 ring-4 ring-emerald-100';
+            else if (showFeedback && selected) cls = 'border-red-300 bg-red-50 ring-4 ring-red-100';
             return (
               <button
                 key={i}
                 type="button"
                 disabled={locked}
                 onClick={() => onChange?.(String(i))}
-                className={`flex items-center gap-3 rounded-xl border-2 px-4 py-3 text-left font-semibold text-slate-700 transition disabled:cursor-default ${cls}`}
+                className={`flex items-center gap-3 rounded-2xl border-2 border-b-4 px-4 py-3.5 text-left text-lg font-medium text-slate-700 transition active:translate-y-0.5 disabled:cursor-default disabled:active:translate-y-0 ${cls}`}
               >
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-slate-100 text-sm font-extrabold">{OPTION_LETTERS[i]}</span>
+                <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl font-display text-lg font-extrabold ${LETTER_STYLES[i % LETTER_STYLES.length]}`}>
+                  {OPTION_LETTERS[i]}
+                </span>
                 <span>{opt}</span>
+                {showFeedback && i === q.answer && <span className="ml-auto text-xl">✅</span>}
+                {showFeedback && selected && i !== q.answer && <span className="ml-auto text-xl">❌</span>}
               </button>
             );
           })}
         </div>
       ) : (
-        <div className="mt-4">
-          <div className="flex items-center gap-2">
+        <div className="mt-5">
+          <div className="flex items-center gap-3">
             <input
               ref={inputRef}
               type="text"
@@ -73,32 +95,29 @@ export default function QuestionCard({ question: q, index, value, onChange, lock
                 if (e.key === 'Enter') onEnter?.();
               }}
               placeholder="Nhập đáp án…"
-              className={`w-full max-w-xs rounded-xl border-2 px-4 py-2.5 text-lg font-bold outline-none transition focus:border-pink-500 disabled:bg-slate-50 ${
-                showFeedback ? (correct ? 'border-emerald-500' : 'border-red-400') : 'border-slate-200'
+              className={`w-full max-w-xs rounded-2xl border-2 border-b-4 bg-white px-4 py-3 font-display text-2xl font-bold text-slate-800 outline-none transition placeholder:font-sans placeholder:text-lg placeholder:font-normal placeholder:text-slate-300 focus:border-pink-400 focus:ring-4 focus:ring-pink-100 disabled:bg-slate-50 ${
+                showFeedback ? (correct ? 'border-emerald-400' : 'border-red-300') : 'border-slate-200'
               }`}
             />
-            {q.unit && <span className="font-bold text-slate-600">{q.unit}</span>}
+            {q.unit && <span className="font-display text-xl font-bold text-slate-600">{q.unit}</span>}
           </div>
-          {!locked && <p className="mt-1.5 text-xs text-slate-400">Số thập phân dùng dấu phẩy, ví dụ 0,75. Phân số viết dạng 3/4.</p>}
+          {!locked && <p className="mt-2 text-sm text-slate-400">✍️ Số thập phân dùng dấu phẩy, ví dụ 0,75. Phân số viết dạng 3/4.</p>}
         </div>
       )}
 
       {showFeedback && (
-        <div className={`mt-4 rounded-xl p-4 ${correct ? 'bg-emerald-50' : 'bg-red-50'}`}>
-          <p className={`flex items-center gap-2 font-extrabold ${correct ? 'text-emerald-700' : 'text-red-700'}`}>
-            {correct ? <CheckCircle2 className="h-5 w-5" /> : <XCircle className="h-5 w-5" />}
-            {correct ? 'Chính xác! Giỏi lắm!' : 'Chưa đúng rồi'}
+        <div className={`mt-5 rounded-2xl border-2 p-4 animate-pop ${correct ? 'border-emerald-200 bg-emerald-50' : 'border-red-200 bg-red-50'}`}>
+          <p className={`font-display text-2xl font-extrabold ${correct ? 'text-emerald-600' : 'text-red-600'}`}>
+            {correct ? praiseFor(q.id) : '🤔 Chưa đúng rồi, xem cách giải nhé!'}
           </p>
           {!correct && (
-            <p className="mt-1 text-sm text-slate-700">
+            <p className="mt-1 text-slate-700">
               Em trả lời: <b>{userAnswerText(q, value)}</b> · Đáp án đúng: <b className="text-emerald-700">{correctAnswerText(q)}</b>
             </p>
           )}
-          <div className="mt-3 rounded-lg bg-white/70 p-3 text-sm text-slate-700">
-            <p className="mb-1 flex items-center gap-1.5 font-bold text-amber-700">
-              <Lightbulb className="h-4 w-4" /> Hướng dẫn giải
-            </p>
-            <p className="whitespace-pre-line">{q.explanation}</p>
+          <div className="mt-3 rounded-xl border-2 border-amber-200 bg-amber-50 p-3.5 text-slate-700">
+            <p className="mb-1 font-display text-lg font-bold text-amber-700">💡 Hướng dẫn giải</p>
+            <p className="whitespace-pre-line leading-relaxed">{q.explanation}</p>
             <p className="mt-2 text-xs text-slate-400">Nguồn: {q.source}</p>
           </div>
         </div>

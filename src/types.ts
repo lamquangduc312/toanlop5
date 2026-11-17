@@ -14,10 +14,17 @@ export interface Topic {
   description: string;
   /** Mẹo giải rút ra từ phần "Hướng dẫn giải" của các đề */
   tips: string[];
-  /** Lớp Tailwind cho nền + chữ của biểu tượng */
+  emoji: string;
+  /** Lớp Tailwind cho nền + chữ của nhãn */
   accent: string;
   /** Lớp Tailwind cho thanh tiến độ */
   bar: string;
+  /** Nền nhạt của thẻ chủ đề */
+  soft: string;
+  border: string;
+  text: string;
+  /** Màu nút bấm "lún" (dùng cùng lớp .btn) */
+  btn: string;
 }
 
 interface BaseQuestion {

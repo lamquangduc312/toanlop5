@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, Cloud, CloudOff, GraduationCap, Timer } from 'lucide-react';
+import { Cloud, CloudOff } from 'lucide-react';
 import { STUDENT } from '../mockData';
 
 export type Tab = 'topics' | 'exams' | 'stats';
@@ -10,51 +10,51 @@ interface Props {
   dataSource: 'firebase' | 'local';
 }
 
-const TABS: { id: Tab; label: string; icon: typeof BookOpen }[] = [
-  { id: 'topics', label: 'Học theo chủ đề', icon: BookOpen },
-  { id: 'exams', label: 'Làm đề 40 phút', icon: Timer },
-  { id: 'stats', label: 'Thống kê', icon: BarChart3 },
+const TABS: { id: Tab; label: string; short: string; emoji: string; active: string }[] = [
+  { id: 'topics', label: 'Học theo chủ đề', short: 'Chủ đề', emoji: '📚', active: 'bg-pink-500 border-pink-700 text-white' },
+  { id: 'exams', label: 'Làm đề 40 phút', short: 'Làm đề', emoji: '⏱️', active: 'bg-indigo-500 border-indigo-700 text-white' },
+  { id: 'stats', label: 'Thống kê', short: 'Thống kê', emoji: '📊', active: 'bg-emerald-500 border-emerald-700 text-white' },
 ];
 
 export default function Header({ tab, onTab, showNav, dataSource }: Props) {
   return (
-    <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur">
+    <header className="sticky top-0 z-20 border-b-2 border-orange-100 bg-white/90 backdrop-blur">
+      <div className="h-1.5 bg-[linear-gradient(90deg,#f472b6,#fb923c,#facc15,#34d399,#38bdf8,#a78bfa)]" />
       <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-3 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-pink-500 to-orange-400 text-white">
-            <GraduationCap className="h-6 w-6" />
+        <div className="flex items-center gap-3">
+          <span className="grid h-12 w-12 place-items-center rounded-2xl border-b-4 border-pink-700 bg-gradient-to-br from-orange-400 to-pink-500 font-display text-3xl font-extrabold text-white shadow-sm">
+            5
           </span>
           <div className="leading-tight">
-            <p className="text-lg font-extrabold text-slate-800">Toán 5 cùng Hà Ngân</p>
-            <p className="text-xs text-slate-500">
+            <p className="font-display text-2xl font-extrabold leading-none text-slate-800">
+              Toán 5 cùng <span className="text-pink-500">Hà Ngân</span>
+            </p>
+            <p className="mt-1 text-xs text-slate-500">
               {STUDENT.name} · Lớp {STUDENT.className} · {STUDENT.school}
             </p>
           </div>
         </div>
 
         <span
-          className={`ml-auto inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${
-            dataSource === 'firebase' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
-          }`}
+          className={`chip ml-auto ${dataSource === 'firebase' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800'}`}
           title={dataSource === 'firebase' ? 'Kết quả được lưu trên Firebase' : 'Chưa kết nối Firebase – kết quả lưu trên trình duyệt này'}
         >
           {dataSource === 'firebase' ? <Cloud className="h-3.5 w-3.5" /> : <CloudOff className="h-3.5 w-3.5" />}
-          {dataSource === 'firebase' ? 'Firebase' : 'Lưu trên máy'}
+          {dataSource === 'firebase' ? 'Đã lưu online' : 'Lưu trên máy'}
         </span>
 
         {showNav && (
-          <nav className="flex w-full gap-1 rounded-xl bg-slate-100 p-1 sm:w-auto">
-            {TABS.map(({ id, label, icon: Icon }) => (
+          <nav className="flex w-full gap-2 sm:w-auto">
+            {TABS.map(({ id, label, short, emoji, active }) => (
               <button
                 key={id}
                 onClick={() => onTab(id)}
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-bold transition sm:flex-none ${
-                  tab === id ? 'bg-white text-pink-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                }`}
+                aria-current={tab === id ? 'page' : undefined}
+                className={`btn flex-1 px-3 py-2 text-base sm:flex-none ${tab === id ? active : 'btn-white'}`}
               >
-                <Icon className="h-4 w-4" />
+                <span aria-hidden>{emoji}</span>
                 <span className="hidden sm:inline">{label}</span>
-                <span className="sm:hidden">{label.split(' ')[0]}</span>
+                <span className="sm:hidden">{short}</span>
               </button>
             ))}
           </nav>

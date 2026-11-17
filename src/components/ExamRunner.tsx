@@ -1,4 +1,4 @@
-import { AlertTriangle, ChevronLeft, ChevronRight, Send, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Send, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { buildAttempt } from '../lib/grading';
 import type { Attempt, QuizSession } from '../types';
@@ -63,22 +63,19 @@ export default function ExamRunner({ session, onFinish, onExit }: Props) {
 
   return (
     <section className="mx-auto max-w-4xl space-y-4">
-      <div className="sticky top-[72px] z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-sm backdrop-blur">
-        <button onClick={() => setConfirm('exit')} className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700" title="Thoát">
+      <div className="card sticky top-[84px] z-10 flex flex-wrap items-center gap-3 p-3">
+        <button onClick={() => setConfirm('exit')} className="btn btn-white p-2" title="Thoát" aria-label="Thoát bài thi">
           <X className="h-5 w-5" />
         </button>
         <div className="min-w-0 flex-1">
-          <p className="truncate font-extrabold text-slate-800">{session.title}</p>
-          <p className="text-xs text-slate-500">
-            Đã làm {answeredCount}/{session.questions.length} câu
+          <p className="truncate font-display text-xl font-bold leading-tight text-slate-800">{session.title}</p>
+          <p className="text-sm text-slate-500">
+            ✏️ Đã làm <b className="text-pink-600">{answeredCount}</b>/{session.questions.length} câu
           </p>
         </div>
         <Timer remainingSec={remaining} totalSec={totalSec} />
-        <button
-          onClick={() => setConfirm('submit')}
-          className="inline-flex items-center gap-1.5 rounded-xl bg-pink-500 px-4 py-2 font-bold text-white hover:bg-pink-600"
-        >
-          <Send className="h-4 w-4" /> Nộp bài
+        <button onClick={() => setConfirm('submit')} className="btn btn-pink">
+          <Send className="h-5 w-5" /> Nộp bài
         </button>
       </div>
 
@@ -89,8 +86,13 @@ export default function ExamRunner({ session, onFinish, onExit }: Props) {
             <button
               key={x.id}
               onClick={() => setIndex(i)}
-              className={`h-9 w-9 rounded-lg text-sm font-extrabold transition ${
-                i === index ? 'bg-slate-800 text-white' : done ? 'bg-pink-100 text-pink-700' : 'bg-white text-slate-500 ring-1 ring-slate-200'
+              aria-label={`Câu ${i + 1}${done ? ' – đã làm' : ''}`}
+              className={`h-11 w-11 rounded-xl border-2 border-b-4 font-display text-lg font-bold transition active:translate-y-0.5 ${
+                i === index
+                  ? 'border-indigo-700 bg-indigo-500 text-white'
+                  : done
+                    ? 'border-pink-300 bg-pink-100 text-pink-700'
+                    : 'border-slate-200 bg-white text-slate-500'
               }`}
             >
               {i + 1}
@@ -110,17 +112,13 @@ export default function ExamRunner({ session, onFinish, onExit }: Props) {
       />
 
       <div className="flex justify-between">
-        <button
-          onClick={() => setIndex((i) => Math.max(0, i - 1))}
-          disabled={index === 0}
-          className="inline-flex items-center gap-1 rounded-xl bg-white px-4 py-2 font-bold text-slate-700 ring-1 ring-slate-200 disabled:opacity-40"
-        >
+        <button onClick={() => setIndex((i) => Math.max(0, i - 1))} disabled={index === 0} className="btn btn-white">
           <ChevronLeft className="h-5 w-5" /> Câu trước
         </button>
         <button
           onClick={() => setIndex((i) => Math.min(session.questions.length - 1, i + 1))}
           disabled={index === session.questions.length - 1}
-          className="inline-flex items-center gap-1 rounded-xl bg-white px-4 py-2 font-bold text-slate-700 ring-1 ring-slate-200 disabled:opacity-40"
+          className="btn btn-indigo"
         >
           Câu sau <ChevronRight className="h-5 w-5" />
         </button>
@@ -128,11 +126,11 @@ export default function ExamRunner({ session, onFinish, onExit }: Props) {
 
       {confirm && (
         <div className="fixed inset-0 z-30 grid place-items-center bg-slate-900/40 p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
-            <p className="flex items-center gap-2 text-lg font-extrabold text-slate-800">
-              <AlertTriangle className="h-5 w-5 text-amber-500" />
-              {confirm === 'submit' ? 'Nộp bài?' : 'Thoát bài thi?'}
+          <div className="card w-full max-w-sm p-6 text-center animate-pop">
+            <p className="text-5xl" aria-hidden>
+              {confirm === 'submit' ? (unanswered > 0 ? '🧐' : '📮') : '🚪'}
             </p>
+            <p className="mt-2 font-display text-2xl font-extrabold text-slate-800">{confirm === 'submit' ? 'Nộp bài nhé?' : 'Thoát bài thi?'}</p>
             <p className="mt-2 text-slate-600">
               {confirm === 'submit'
                 ? unanswered > 0
@@ -140,8 +138,8 @@ export default function ExamRunner({ session, onFinish, onExit }: Props) {
                   : 'Em đã làm hết các câu. Dò lại đơn vị và dấu phẩy rồi nộp nhé!'
                 : 'Bài làm sẽ không được chấm và không được lưu.'}
             </p>
-            <div className="mt-5 flex justify-end gap-2">
-              <button onClick={() => setConfirm(null)} className="rounded-xl px-4 py-2 font-bold text-slate-600 hover:bg-slate-100">
+            <div className="mt-5 flex justify-center gap-3">
+              <button onClick={() => setConfirm(null)} className="btn btn-white">
                 Làm tiếp
               </button>
               <button
@@ -152,7 +150,7 @@ export default function ExamRunner({ session, onFinish, onExit }: Props) {
                     onExit();
                   }
                 }}
-                className={`rounded-xl px-4 py-2 font-bold text-white ${confirm === 'submit' ? 'bg-pink-500 hover:bg-pink-600' : 'bg-slate-700 hover:bg-slate-800'}`}
+                className={`btn ${confirm === 'submit' ? 'btn-pink' : 'border-slate-900 bg-slate-700 text-white hover:bg-slate-600'}`}
               >
                 {confirm === 'submit' ? 'Nộp bài' : 'Thoát'}
               </button>

@@ -2,10 +2,102 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  -webkit-tap-highlight-color: transparent;
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply font-sans text-slate-700 antialiased;
+    /* Nền kem ấm với chấm bi nhẹ */
+    background-color: #fff9ef;
+    background-image: radial-gradient(circle at 1px 1px, rgba(251, 146, 60, 0.16) 1.2px, transparent 0);
+    background-size: 24px 24px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+  }
 }
 
-body {
-  @apply bg-white font-sans text-slate-800 antialiased;
+@layer components {
+  /* Nút "bấm lún" vui mắt */
+  .btn {
+    @apply inline-flex select-none items-center justify-center gap-2 rounded-2xl border-b-4 px-5 py-2.5 font-display text-lg font-bold leading-tight transition-all duration-100 active:translate-y-[3px] active:border-b disabled:cursor-not-allowed disabled:opacity-50 disabled:active:translate-y-0 disabled:active:border-b-4;
+  }
+  .btn-pink {
+    @apply border-pink-700 bg-pink-500 text-white hover:bg-pink-400;
+  }
+  .btn-indigo {
+    @apply border-indigo-700 bg-indigo-500 text-white hover:bg-indigo-400;
+  }
+  .btn-emerald {
+    @apply border-emerald-700 bg-emerald-500 text-white hover:bg-emerald-400;
+  }
+  .btn-orange {
+    @apply border-orange-700 bg-orange-500 text-white hover:bg-orange-400;
+  }
+  .btn-white {
+    @apply border-2 border-b-4 border-slate-200 bg-white text-slate-700 hover:bg-slate-50;
+  }
+
+  .card {
+    @apply rounded-3xl border-2 border-white bg-white shadow-[0_12px_30px_-18px_rgba(234,88,12,0.45)];
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+}
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-pop {
+  animation: pop 0.35s ease-out both;
+}
+.animate-wiggle {
+  animation: wiggle 1.4s ease-in-out infinite;
+}
+.animate-floaty {
+  animation: floaty 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pop,
+  .animate-wiggle,
+  .animate-floaty {
+    animation: none;
+  }
 }

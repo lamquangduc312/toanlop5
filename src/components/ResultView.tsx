@@ -1,11 +1,10 @@
-import { Cloud, CloudOff, Home, Loader2, RotateCcw, Target, Trophy } from 'lucide-react';
+import { Cloud, CloudOff, Home, Loader2, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
 import { QUESTION_MAP, TOPICS } from '../mockData';
 import { formatDuration, formatScore } from '../lib/grading';
 import type { Attempt, SaveState, TopicId } from '../types';
 import ProgressBar from './ProgressBar';
 import QuestionCard from './QuestionCard';
-import TopicIcon from './TopicIcon';
 
 interface Props {
   attempt: Attempt;
@@ -16,10 +15,10 @@ interface Props {
 }
 
 function cheer(score: number) {
-  if (score >= 9) return { text: 'Xuất sắc! Hà Ngân làm rất tốt!', cls: 'from-emerald-400 to-teal-500' };
-  if (score >= 7) return { text: 'Khá lắm! Ôn thêm chút nữa là điểm 9, 10 thôi!', cls: 'from-sky-400 to-indigo-500' };
-  if (score >= 5) return { text: 'Cố lên! Xem lại hướng dẫn giải các câu sai nhé.', cls: 'from-amber-400 to-orange-500' };
-  return { text: 'Không sao cả! Mình ôn lại từng chủ đề rồi làm lại nhé.', cls: 'from-pink-400 to-rose-500' };
+  if (score >= 9) return { emoji: '🏆', stars: 3, text: 'Xuất sắc! Hà Ngân làm rất tốt!', cls: 'from-emerald-400 via-teal-400 to-sky-400' };
+  if (score >= 7) return { emoji: '🌟', stars: 2, text: 'Khá lắm! Ôn thêm chút nữa là điểm 9, 10 thôi!', cls: 'from-sky-400 via-indigo-400 to-violet-400' };
+  if (score >= 5) return { emoji: '💪', stars: 1, text: 'Cố lên! Xem lại hướng dẫn giải các câu sai nhé.', cls: 'from-amber-400 via-orange-400 to-pink-400' };
+  return { emoji: '🌱', stars: 0, text: 'Không sao cả! Mình ôn lại từng chủ đề rồi làm lại nhé.', cls: 'from-pink-400 via-rose-400 to-orange-400' };
 }
 
 export default function ResultView({ attempt, saveState, onRetry, onHome, onPracticeTopic }: Props) {
@@ -33,28 +32,33 @@ export default function ResultView({ attempt, saveState, onRetry, onHome, onPrac
 
   return (
     <section className="mx-auto max-w-3xl space-y-5">
-      <div className={`rounded-3xl bg-gradient-to-br ${c.cls} p-6 text-white shadow-lg`}>
-        <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide opacity-90">
-          <Trophy className="h-4 w-4" /> {attempt.title}
+      <div className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${c.cls} p-6 text-white shadow-xl animate-pop`}>
+        <span className="pointer-events-none absolute -right-2 -top-2 text-8xl animate-floaty sm:text-9xl" aria-hidden>
+          {c.emoji}
+        </span>
+        <p className="pr-24 font-display text-lg font-bold uppercase tracking-wide opacity-95">{attempt.title}</p>
+        <p className="mt-1 text-3xl tracking-tight" aria-label={`${c.stars} sao`}>
+          {'⭐'.repeat(c.stars)}
+          <span className="opacity-30">{'⭐'.repeat(3 - c.stars)}</span>
         </p>
-        <div className="mt-2 flex flex-wrap items-end gap-x-6 gap-y-2">
-          <p className="text-6xl font-extrabold">
+        <div className="mt-1 flex flex-wrap items-end gap-x-6 gap-y-2">
+          <p className="font-display text-7xl font-extrabold leading-none">
             {formatScore(attempt.score10)}
-            <span className="text-2xl opacity-80">/10</span>
+            <span className="text-3xl opacity-80">/10</span>
           </p>
-          <div className="pb-2 text-sm font-semibold opacity-95">
+          <div className="pb-1 text-sm font-medium">
             <p>
-              Đúng {attempt.correctCount}/{attempt.total} câu · {formatScore(attempt.earned)}/{formatScore(attempt.maxPoints)} điểm
+              ✅ Đúng {attempt.correctCount}/{attempt.total} câu · {formatScore(attempt.earned)}/{formatScore(attempt.maxPoints)} điểm
             </p>
             <p>
-              Thời gian: {formatDuration(attempt.durationSec)}
+              ⏱️ {formatDuration(attempt.durationSec)}
               {attempt.timeLimitSec ? ` / ${formatDuration(attempt.timeLimitSec)}` : ''}
               {attempt.timedOut ? ' · Hết giờ, tự nộp bài' : ''}
             </p>
           </div>
         </div>
-        <p className="mt-3 text-lg font-bold">{c.text}</p>
-        <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">
+        <p className="mt-3 font-display text-2xl font-bold">{c.text}</p>
+        <p className="chip mt-3 bg-white/25 px-3 py-1 text-white">
           {saveState.status === 'saving' && (
             <>
               <Loader2 className="h-3.5 w-3.5 animate-spin" /> Đang lưu kết quả…
@@ -62,7 +66,7 @@ export default function ResultView({ attempt, saveState, onRetry, onHome, onPrac
           )}
           {saveState.status === 'saved' && saveState.where === 'firebase' && (
             <>
-              <Cloud className="h-3.5 w-3.5" /> Đã lưu lên Firebase
+              <Cloud className="h-3.5 w-3.5" /> Đã lưu online
             </>
           )}
           {saveState.status === 'saved' && saveState.where === 'local' && (
@@ -73,29 +77,27 @@ export default function ResultView({ attempt, saveState, onRetry, onHome, onPrac
         </p>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-3 flex items-center gap-2 font-extrabold text-slate-800">
-          <Target className="h-5 w-5 text-pink-500" /> Kết quả theo chủ đề
-        </h2>
+      <div className="card p-5">
+        <h2 className="mb-3 text-2xl font-bold text-slate-800">🎯 Kết quả theo chủ đề</h2>
         <div className="space-y-3">
           {topicRows.map((row) => {
             const topic = TOPICS.find((t) => t.id === row.topicId)!;
             return (
               <div key={row.topicId} className="flex items-center gap-3">
-                <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg ${topic.accent}`}>
-                  <TopicIcon topicId={row.topicId} className="h-4 w-4" />
+                <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl text-xl ${topic.accent}`} aria-hidden>
+                  {topic.emoji}
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex justify-between text-sm">
-                    <span className="truncate font-semibold text-slate-700">{topic.name}</span>
-                    <span className="shrink-0 font-bold text-slate-500">
+                    <span className="truncate font-medium text-slate-700">{topic.name}</span>
+                    <span className="shrink-0 font-display text-base font-bold text-slate-600">
                       {row.correct}/{row.total}
                     </span>
                   </div>
-                  <ProgressBar value={row.acc} colorClass={row.acc < 0.6 ? 'bg-red-500' : row.acc < 0.85 ? 'bg-amber-400' : 'bg-emerald-500'} />
+                  <ProgressBar value={row.acc} colorClass={row.acc < 0.6 ? 'bg-red-400' : row.acc < 0.85 ? 'bg-amber-400' : 'bg-emerald-500'} />
                 </div>
                 {row.acc < 0.85 && (
-                  <button onClick={() => onPracticeTopic(row.topicId)} className="shrink-0 rounded-lg bg-pink-50 px-2.5 py-1 text-xs font-bold text-pink-600 hover:bg-pink-100">
+                  <button onClick={() => onPracticeTopic(row.topicId)} className={`btn shrink-0 px-3 py-1.5 text-sm ${topic.btn}`}>
                     Ôn ngay
                   </button>
                 )}
@@ -105,24 +107,24 @@ export default function ResultView({ attempt, saveState, onRetry, onHome, onPrac
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        <button onClick={onRetry} className="inline-flex items-center gap-2 rounded-xl bg-indigo-500 px-4 py-2 font-bold text-white hover:bg-indigo-600">
-          <RotateCcw className="h-4 w-4" /> Làm lại
+      <div className="flex flex-wrap gap-3">
+        <button onClick={onRetry} className="btn btn-indigo">
+          <RotateCcw className="h-5 w-5" /> Làm lại
         </button>
-        <button onClick={onHome} className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 font-bold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50">
-          <Home className="h-4 w-4" /> Về trang chính
+        <button onClick={onHome} className="btn btn-white">
+          <Home className="h-5 w-5" /> Về trang chính
         </button>
       </div>
 
       <div>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-extrabold text-slate-800">Xem lại bài làm & hướng dẫn giải</h2>
-          <div className="flex rounded-lg bg-slate-100 p-1 text-sm font-bold">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-2xl font-bold text-slate-800">📒 Xem lại bài & cách giải</h2>
+          <div className="flex gap-2">
             {(['wrong', 'all'] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`rounded-md px-3 py-1 ${filter === f ? 'bg-white text-pink-600 shadow-sm' : 'text-slate-500'}`}
+                className={`btn px-3 py-1.5 text-sm ${filter === f ? 'border-pink-700 bg-pink-500 text-white' : 'btn-white'}`}
               >
                 {f === 'wrong' ? `Câu sai (${attempt.total - attempt.correctCount})` : 'Tất cả'}
               </button>
@@ -130,9 +132,9 @@ export default function ResultView({ attempt, saveState, onRetry, onHome, onPrac
           </div>
         </div>
         {results.length === 0 ? (
-          <p className="rounded-2xl bg-emerald-50 p-6 text-center font-bold text-emerald-700">Không có câu nào sai. Tuyệt vời! 🎉</p>
+          <p className="card p-8 text-center font-display text-2xl font-bold text-emerald-600">🎉 Không có câu nào sai. Tuyệt vời!</p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {results.map((r) => {
               const q = QUESTION_MAP[r.questionId];
               if (!q) return null;

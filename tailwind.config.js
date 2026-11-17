@@ -4,7 +4,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Nunito', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        // Lexend: font thiết kế để dễ đọc; Baloo 2: tròn, vui – đều hỗ trợ tiếng Việt
+        sans: ['Lexend', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['"Baloo 2"', 'Lexend', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
     },
   },
