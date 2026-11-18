@@ -1,4 +1,4 @@
-import { Cloud, CloudOff } from 'lucide-react';
+import { CloudOff } from 'lucide-react';
 import { STUDENT } from '../mockData';
 
 export type Tab = 'topics' | 'exams' | 'stats';
@@ -35,16 +35,15 @@ export default function Header({ tab, onTab, showNav, dataSource }: Props) {
           </div>
         </div>
 
-        <span
-          className={`chip ml-auto ${dataSource === 'firebase' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800'}`}
-          title={dataSource === 'firebase' ? 'Kết quả được lưu trên Firebase' : 'Chưa kết nối Firebase – kết quả lưu trên trình duyệt này'}
-        >
-          {dataSource === 'firebase' ? <Cloud className="h-3.5 w-3.5" /> : <CloudOff className="h-3.5 w-3.5" />}
-          {dataSource === 'firebase' ? 'Đã lưu online' : 'Lưu trên máy'}
-        </span>
+        {/* Chỉ báo khi KHÔNG lưu được online (để phụ huynh biết mà kiểm tra) */}
+        {dataSource === 'local' && (
+          <span className="chip ml-auto bg-amber-100 text-amber-800" title="Chưa kết nối Firebase – kết quả lưu trên trình duyệt này">
+            <CloudOff className="h-3.5 w-3.5" /> Lưu trên máy
+          </span>
+        )}
 
         {showNav && (
-          <nav className="flex w-full gap-2 sm:w-auto">
+          <nav className={`flex w-full gap-2 sm:w-auto ${dataSource === 'local' ? '' : 'sm:ml-auto'}`}>
             {TABS.map(({ id, label, short, emoji, active }) => (
               <button
                 key={id}

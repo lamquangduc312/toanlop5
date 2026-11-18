@@ -1,4 +1,4 @@
-import { Cloud, CloudOff, Home, Loader2, RotateCcw } from 'lucide-react';
+import { CloudOff, Home, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
 import { QUESTION_MAP, TOPICS } from '../mockData';
 import { formatDuration, formatScore } from '../lib/grading';
@@ -58,23 +58,12 @@ export default function ResultView({ attempt, saveState, onRetry, onHome, onPrac
           </div>
         </div>
         <p className="mt-3 font-display text-2xl font-bold">{c.text}</p>
-        <p className="chip mt-3 bg-white/25 px-3 py-1 text-white">
-          {saveState.status === 'saving' && (
-            <>
-              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Đang lưu kết quả…
-            </>
-          )}
-          {saveState.status === 'saved' && saveState.where === 'firebase' && (
-            <>
-              <Cloud className="h-3.5 w-3.5" /> Đã lưu online
-            </>
-          )}
-          {saveState.status === 'saved' && saveState.where === 'local' && (
-            <>
-              <CloudOff className="h-3.5 w-3.5" /> {saveState.note ?? 'Đã lưu trên trình duyệt này'}
-            </>
-          )}
-        </p>
+        {/* Chỉ báo khi KHÔNG lưu được online */}
+        {saveState.status === 'saved' && saveState.where === 'local' && (
+          <p className="chip mt-3 bg-white/25 px-3 py-1 text-white">
+            <CloudOff className="h-3.5 w-3.5" /> {saveState.note ?? 'Đã lưu trên trình duyệt này'}
+          </p>
+        )}
       </div>
 
       <div className="card p-5">
