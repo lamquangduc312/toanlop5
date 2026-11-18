@@ -1,7 +1,8 @@
-import { CloudOff, Home, RotateCcw } from 'lucide-react';
-import { useState } from 'react';
+import { CloudOff, Home, RotateCcw, Volume2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { QUESTION_MAP, TOPICS } from '../mockData';
 import { formatDuration, formatScore } from '../lib/grading';
+import { playResultSound } from '../lib/sound';
 import type { Attempt, SaveState, TopicId } from '../types';
 import ProgressBar from './ProgressBar';
 import QuestionCard from './QuestionCard';
@@ -21,9 +22,19 @@ function cheer(score: number) {
   return { emoji: '🌱', stars: 0, text: 'Không sao cả! Mình ôn lại từng chủ đề rồi làm lại nhé.', cls: 'from-pink-400 via-rose-400 to-orange-400' };
 }
 
+// Ghi nhớ bài đã phát âm thanh (tránh phát 2 lần khi React StrictMode chạy lại effect)
+let playedFor: number | undefined;
+
 export default function ResultView({ attempt, saveState, onRetry, onHome, onPracticeTopic }: Props) {
   const [filter, setFilter] = useState<'all' | 'wrong'>('wrong');
   const c = cheer(attempt.score10);
+
+  // Phát âm thanh thông báo một lần cho mỗi bài làm
+  useEffect(() => {
+    if (playedFor === attempt.createdAt) return;
+    playedFor = attempt.createdAt;
+    playResultSound(attempt.score10);
+  }, [attempt.createdAt, attempt.score10]);
   const results = filter === 'wrong' ? attempt.results.filter((r) => !r.correct) : attempt.results;
 
   const topicRows = (Object.entries(attempt.perTopic) as [TopicId, { correct: number; total: number }][])
@@ -57,7 +68,17 @@ export default function ResultView({ attempt, saveState, onRetry, onHome, onPrac
             </p>
           </div>
         </div>
-        <p className="mt-3 font-display text-2xl font-bold">{c.text}</p>
+        <p className="mt-3 flex items-center gap-2 font-display text-2xl font-bold">
+          {c.text}
+          <button
+            onClick={() => playResultSound(attempt.score10)}
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/25 hover:bg-white/40"
+            title="Nghe lại"
+            aria-label="Nghe lại âm thanh"
+          >
+            <Volume2 className="h-5 w-5" />
+          </button>
+        </p>
         {/* Chỉ báo khi KHÔNG lưu được online */}
         {saveState.status === 'saved' && saveState.where === 'local' && (
           <p className="chip mt-3 bg-white/25 px-3 py-1 text-white">

@@ -1,4 +1,6 @@
-import { CloudOff } from 'lucide-react';
+import { CloudOff, Volume2, VolumeX } from 'lucide-react';
+import { useState } from 'react';
+import { isMuted, playTest, setMuted } from '../lib/sound';
 import { STUDENT } from '../mockData';
 
 export type Tab = 'topics' | 'exams' | 'stats';
@@ -17,6 +19,14 @@ const TABS: { id: Tab; label: string; short: string; emoji: string; active: stri
 ];
 
 export default function Header({ tab, onTab, showNav, dataSource }: Props) {
+  const [muted, setMutedState] = useState(isMuted);
+  const toggleSound = () => {
+    const next = !muted;
+    setMuted(next);
+    setMutedState(next);
+    if (!next) playTest();
+  };
+
   return (
     <header className="sticky top-0 z-20 border-b-2 border-orange-100 bg-white/90 backdrop-blur">
       <div className="h-1.5 bg-[linear-gradient(90deg,#f472b6,#fb923c,#facc15,#34d399,#38bdf8,#a78bfa)]" />
@@ -42,8 +52,18 @@ export default function Header({ tab, onTab, showNav, dataSource }: Props) {
           </span>
         )}
 
+        <button
+          onClick={toggleSound}
+          className={`btn btn-white px-2.5 py-2 ${dataSource === 'local' ? '' : 'ml-auto'}`}
+          title={muted ? 'Bật âm thanh' : 'Tắt âm thanh'}
+          aria-label={muted ? 'Bật âm thanh' : 'Tắt âm thanh'}
+          aria-pressed={!muted}
+        >
+          {muted ? <VolumeX className="h-5 w-5 text-slate-400" /> : <Volume2 className="h-5 w-5 text-pink-500" />}
+        </button>
+
         {showNav && (
-          <nav className={`flex w-full gap-2 sm:w-auto ${dataSource === 'local' ? '' : 'sm:ml-auto'}`}>
+          <nav className="flex w-full gap-2 sm:w-auto">
             {TABS.map(({ id, label, short, emoji, active }) => (
               <button
                 key={id}
