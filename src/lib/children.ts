@@ -159,7 +159,7 @@ export async function claimLegacy(user: User): Promise<boolean> {
   const existing = await getDoc(ref);
   if (existing.exists() && existing.data().ownerUid !== user.uid) return false;
   if (!existing.exists()) {
-    await createChild(user.uid, { nickname: 'Ngân', avatar: '🐼', className: '5A7', school: 'Đại Kim' }, LEGACY_CHILD_ID);
+    await createChild(user.uid, { nickname: 'Ngân', avatar: '🐼', className: '5A', school: 'Đại Kim' }, LEGACY_CHILD_ID);
   }
   const snap = await getDocs(query(collection(db, ATTEMPTS_COLLECTION), where('studentId', '==', LEGACY_CHILD_ID)));
   const todo = snap.docs.filter((d) => !d.data().ownerUid);
