@@ -1,4 +1,3 @@
-import { STUDENT } from '../mockData';
 import type { Attempt, Question, QuestionResult, QuizSession, TopicId, TopicScore } from '../types';
 
 export const OPTION_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -85,8 +84,9 @@ export function buildAttempt(
   const maxPoints = results.reduce((s, r) => s + r.points, 0);
 
   return {
-    studentId: STUDENT.id,
-    studentName: STUDENT.name,
+    // App gắn mã bé + biệt danh khi lưu
+    studentId: '',
+    studentName: '',
     mode: session.mode,
     refId: session.refId,
     title: session.title,

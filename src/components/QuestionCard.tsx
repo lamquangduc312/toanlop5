@@ -23,7 +23,7 @@ const LETTER_STYLES = [
   'bg-emerald-100 text-emerald-700',
 ];
 
-const PRAISES = ['🎉 Chính xác! Giỏi quá!', '🌟 Đúng rồi! Tuyệt vời!', '👏 Hay lắm, Hà Ngân!', '🚀 Quá đỉnh! Làm tiếp nào!', '💯 Chuẩn luôn!'];
+const PRAISES = ['🎉 Chính xác! Giỏi quá!', '🌟 Đúng rồi! Tuyệt vời!', '👏 Hay lắm!', '🚀 Quá đỉnh! Làm tiếp nào!', '💯 Chuẩn luôn!'];
 
 /** Chọn lời khen cố định theo câu hỏi để không đổi khi giao diện vẽ lại */
 function praiseFor(id: string) {

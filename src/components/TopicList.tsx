@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { TOPICS } from '../mockData';
 import { questionsOfTopic } from '../lib/session';
 import type { Stats, Topic, TopicId, TopicLevel, TopicStat } from '../types';
+import { useLearner } from '../lib/account';
 import ProgressBar from './ProgressBar';
 
 interface Props {
@@ -78,19 +79,30 @@ function TopicCard({ topic, index, stat, onStart }: { topic: Topic; index: numbe
 
 export default function TopicList({ stats, onStart, onReview }: Props) {
   const goodCount = stats.topicStats.filter((s) => s.level === 'good').length;
+  const { name, child, stars, loggedIn, openAccount } = useLearner();
 
   return (
     <section className="space-y-6">
       <div className="card relative overflow-hidden bg-gradient-to-br from-amber-100 via-pink-50 to-sky-100 p-6">
         <span className="pointer-events-none absolute -right-2 -top-3 text-7xl opacity-90 animate-floaty sm:text-8xl" aria-hidden>
-          🐼
+          {child?.avatar ?? '🐼'}
         </span>
-        <h1 className="pr-20 text-3xl font-extrabold text-slate-800 sm:text-4xl">Chào Hà Ngân! 👋</h1>
+        <h1 className="pr-20 text-3xl font-extrabold text-slate-800 sm:text-4xl">Chào {name}! 👋</h1>
         <p className="mt-1 max-w-xl pr-16 text-slate-600">
           Hôm nay mình luyện chủ đề nào nhỉ? Mỗi lượt 10 câu, làm câu nào chấm câu đó, có hướng dẫn giải ngay.
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className="chip bg-white px-3 py-1 text-sm text-orange-600">🔥 {stats.totalAttempts} lượt đã làm</span>
+          {loggedIn && child ? (
+            <>
+              <span className="chip bg-white px-3 py-1 text-sm text-amber-600">⭐ {stars.total} sao</span>
+              {stars.streak > 0 && <span className="chip bg-white px-3 py-1 text-sm text-orange-600">🔥 {stars.streak} ngày liên tiếp</span>}
+            </>
+          ) : (
+            <button onClick={openAccount} className="chip bg-amber-400 px-3 py-1 text-sm text-white hover:bg-amber-500">
+              ⭐ Đăng nhập để tích sao & xếp hạng
+            </button>
+          )}
+          <span className="chip bg-white px-3 py-1 text-sm text-orange-600">📝 {stats.totalAttempts} lượt đã làm</span>
           <span className="chip bg-white px-3 py-1 text-sm text-emerald-600">
             🌟 {goodCount}/{TOPICS.length} chủ đề giỏi
           </span>

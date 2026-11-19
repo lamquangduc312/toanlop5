@@ -2,6 +2,7 @@ import { CloudOff, Home, RotateCcw, Volume2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { QUESTION_MAP, TOPICS } from '../mockData';
 import { formatDuration, formatScore } from '../lib/grading';
+import { useLearner } from '../lib/account';
 import { playResultSound } from '../lib/sound';
 import type { Attempt, SaveState, TopicId } from '../types';
 import ProgressBar from './ProgressBar';
@@ -10,13 +11,15 @@ import QuestionCard from './QuestionCard';
 interface Props {
   attempt: Attempt;
   saveState: SaveState;
+  /** Số sao bài này mang lại */
+  starsGained: number;
   onRetry: () => void;
   onHome: () => void;
   onPracticeTopic: (topicId: TopicId) => void;
 }
 
-function cheer(score: number) {
-  if (score >= 9) return { emoji: '🏆', stars: 3, text: 'Xuất sắc! Hà Ngân làm rất tốt!', cls: 'from-emerald-400 via-teal-400 to-sky-400' };
+function cheer(score: number, name: string) {
+  if (score >= 9) return { emoji: '🏆', stars: 3, text: `Xuất sắc! ${name} làm rất tốt!`, cls: 'from-emerald-400 via-teal-400 to-sky-400' };
   if (score >= 7) return { emoji: '🌟', stars: 2, text: 'Khá lắm! Ôn thêm chút nữa là điểm 9, 10 thôi!', cls: 'from-sky-400 via-indigo-400 to-violet-400' };
   if (score >= 5) return { emoji: '💪', stars: 1, text: 'Cố lên! Xem lại hướng dẫn giải các câu sai nhé.', cls: 'from-amber-400 via-orange-400 to-pink-400' };
   return { emoji: '🌱', stars: 0, text: 'Không sao cả! Mình ôn lại từng chủ đề rồi làm lại nhé.', cls: 'from-pink-400 via-rose-400 to-orange-400' };
@@ -25,9 +28,10 @@ function cheer(score: number) {
 // Ghi nhớ bài đã phát âm thanh (tránh phát 2 lần khi React StrictMode chạy lại effect)
 let playedFor: number | undefined;
 
-export default function ResultView({ attempt, saveState, onRetry, onHome, onPracticeTopic }: Props) {
+export default function ResultView({ attempt, saveState, starsGained, onRetry, onHome, onPracticeTopic }: Props) {
+  const { name, loggedIn, child, openAccount } = useLearner();
   const [filter, setFilter] = useState<'all' | 'wrong'>('wrong');
-  const c = cheer(attempt.score10);
+  const c = cheer(attempt.score10, name === 'bạn' ? 'Bạn' : name);
 
   // Phát âm thanh thông báo một lần cho mỗi bài làm
   useEffect(() => {
@@ -79,6 +83,18 @@ export default function ResultView({ attempt, saveState, onRetry, onHome, onPrac
             <Volume2 className="h-5 w-5" />
           </button>
         </p>
+        {starsGained > 0 && (
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="chip animate-wiggle bg-white px-3 py-1 font-display text-xl font-extrabold text-amber-500 shadow">+{starsGained} ⭐</span>
+            {loggedIn && child ? (
+              <span className="text-sm font-semibold">Đã cộng vào sao của {child.nickname}!</span>
+            ) : (
+              <button onClick={openAccount} className="btn btn-white px-3 py-1 text-sm text-amber-600">
+                Đăng nhập để giữ sao & lên bảng xếp hạng
+              </button>
+            )}
+          </div>
+        )}
         {/* Chỉ báo khi KHÔNG lưu được online */}
         {saveState.status === 'saved' && saveState.where === 'local' && (
           <p className="chip mt-3 bg-white/25 px-3 py-1 text-white">

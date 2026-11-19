@@ -90,6 +90,9 @@ export interface TopicScore {
 
 export interface Attempt {
   id?: string;
+  /** uid Google của phụ huynh (không có = bài làm lúc chưa đăng nhập) */
+  ownerUid?: string;
+  /** Mã hồ sơ bé */
   studentId: string;
   studentName: string;
   mode: QuizMode;
@@ -136,4 +139,4 @@ export interface Stats {
 export type SaveState =
   | { status: 'idle' }
   | { status: 'saving' }
-  | { status: 'saved'; where: 'firebase' | 'local'; note?: string };
+  | { status: 'saved'; where: 'firebase' | 'local' | 'guest'; note?: string };

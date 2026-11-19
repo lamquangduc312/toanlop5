@@ -1,15 +1,70 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Ứng dụng gia đình, không đăng nhập: chỉ cho phép đọc và THÊM bài làm của đúng học sinh,
-    // không cho sửa / xoá. Nếu public website, nên bật Firebase Auth và siết lại quy tắc.
+    // Phụ huynh đăng nhập Google. Mỗi phụ huynh chỉ xem / ghi bài làm và hồ sơ các bé của mình.
+    // Bảng xếp hạng đọc công khai collection children (chỉ có biệt danh, hình đại diện, lớp, sao).
+
+    function signedIn() { return request.auth != null; }
+
+    // Hồ sơ cũ của bé Hà Ngân (trước khi có đăng nhập) thuộc về tài khoản này
+    function isLegacyOwner() {
+      return signedIn()
+        && request.auth.token.email == 'lamquangduc312@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    function ownsChild(childId) {
+      return get(/databases/$(database)/documents/children/$(childId)).data.ownerUid == request.auth.uid;
+    }
+
+    function validProfile(d) {
+      return d.nickname is string && d.nickname.size() >= 1 && d.nickname.size() <= 24
+        && d.avatar is string && d.avatar.size() <= 16
+        && d.className is string && d.className.size() >= 1 && d.className.size() <= 12
+        && d.school is string && d.school.size() <= 40
+        && d.classKey is string && d.classKey.size() <= 80
+        && d.totalStars is int && d.totalStars >= 0
+        && d.weeks is map
+        && d.badges is list && d.badges.size() <= 20
+        && d.keys().hasOnly(['ownerUid', 'nickname', 'avatar', 'className', 'school', 'classKey', 'totalStars', 'weeks',
+                             'streak', 'bestStreak', 'badges', 'lastActiveDay', 'consentAt', 'createdAt', 'updatedAt']);
+    }
+
+    match /children/{childId} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && validProfile(request.resource.data)
+        && request.resource.data.totalStars == 0
+        && (childId != 'lam-ha-ngan-5a7' || isLegacyOwner());
+      // Chống sửa sao tuỳ tiện: tổng sao không giảm, mỗi lần ghi tăng tối đa 300
+      allow update: if signedIn()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && validProfile(request.resource.data)
+        && request.resource.data.totalStars >= resource.data.totalStars
+        && request.resource.data.totalStars <= resource.data.totalStars + 300;
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+    }
+
     match /attempts/{attemptId} {
-      allow read: if resource.data.studentId == 'lam-ha-ngan-5a7';
-      allow create: if request.resource.data.studentId == 'lam-ha-ngan-5a7'
-                    && request.resource.data.score10 is number
-                    && request.resource.data.score10 >= 0
-                    && request.resource.data.score10 <= 10;
-      allow update, delete: if false;
+      allow read: if signedIn()
+        && (resource.data.ownerUid == request.auth.uid
+            || (resource.data.studentId == 'lam-ha-ngan-5a7' && isLegacyOwner()));
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.studentId is string
+        && ownsChild(request.resource.data.studentId)
+        && request.resource.data.score10 is number
+        && request.resource.data.score10 >= 0
+        && request.resource.data.score10 <= 10;
+      // Chỉ dùng một lần: gắn bài làm cũ của Hà Ngân vào tài khoản phụ huynh
+      allow update: if isLegacyOwner()
+        && resource.data.studentId == 'lam-ha-ngan-5a7'
+        && !('ownerUid' in resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ownerUid'])
+        && request.resource.data.ownerUid == request.auth.uid;
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
     }
   }
 }

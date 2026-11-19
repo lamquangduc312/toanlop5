@@ -2,6 +2,7 @@ import { Loader2, RefreshCw, RotateCcw } from 'lucide-react';
 import { TOPICS } from '../mockData';
 import { formatDuration, formatScore } from '../lib/grading';
 import type { Attempt, Stats, TopicId } from '../types';
+import { useLearner } from '../lib/account';
 import ProgressBar from './ProgressBar';
 import { LEVEL_BADGE } from './TopicList';
 
@@ -29,13 +30,14 @@ function StatCard({ emoji, label, value, cls }: { emoji: string; label: string; 
 }
 
 export default function StatsDashboard({ stats, attempts, loading, onRefresh, onPracticeTopic, onReview }: Props) {
+  const { name } = useLearner();
   return (
     <section className="space-y-6">
       <div className="card relative overflow-hidden bg-gradient-to-br from-emerald-100 via-teal-50 to-sky-100 p-6">
         <span className="pointer-events-none absolute -right-1 -top-2 text-7xl animate-floaty sm:text-8xl" aria-hidden>
           📈
         </span>
-        <h1 className="pr-20 text-3xl font-extrabold text-slate-800 sm:text-4xl">Hà Ngân tiến bộ thế nào?</h1>
+        <h1 className="pr-20 text-3xl font-extrabold text-slate-800 sm:text-4xl">{name === 'bạn' ? 'Bạn' : name} tiến bộ thế nào?</h1>
         <p className="mt-1 max-w-xl pr-16 text-slate-600">Tỉ lệ đúng tính trên 30 câu gần nhất của mỗi chủ đề, nên khi em tiến bộ thì con số sẽ tăng theo.</p>
         <button onClick={onRefresh} disabled={loading} className="btn btn-white mt-3 px-3 py-1.5 text-base">
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />} Tải lại
