@@ -34,7 +34,7 @@ export default function StatsDashboard({ stats, attempts, loading, onRefresh, on
   return (
     <section className="space-y-6">
       <div className="card relative overflow-hidden bg-gradient-to-br from-emerald-100 via-teal-50 to-sky-100 p-6">
-        <span className="pointer-events-none absolute -right-1 -top-2 text-7xl animate-floaty sm:text-8xl" aria-hidden>
+        <span className="pointer-events-none absolute right-4 top-4 text-6xl leading-none animate-floaty sm:right-6 sm:top-5 sm:text-7xl" aria-hidden>
           📈
         </span>
         <h1 className="pr-20 text-3xl font-extrabold text-slate-800 sm:text-4xl">{name === 'bạn' ? 'Bạn' : name} tiến bộ thế nào?</h1>

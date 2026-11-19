@@ -48,7 +48,7 @@ export default function ResultView({ attempt, saveState, starsGained, onRetry, o
   return (
     <section className="mx-auto max-w-3xl space-y-5">
       <div className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${c.cls} p-6 text-white shadow-xl animate-pop`}>
-        <span className="pointer-events-none absolute -right-2 -top-2 text-8xl animate-floaty sm:text-9xl" aria-hidden>
+        <span className="pointer-events-none absolute right-4 top-4 text-7xl leading-none animate-floaty sm:right-6 sm:top-5 sm:text-8xl" aria-hidden>
           {c.emoji}
         </span>
         <p className="pr-24 font-display text-lg font-bold uppercase tracking-wide opacity-95">{attempt.title}</p>

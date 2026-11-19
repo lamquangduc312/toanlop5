@@ -84,7 +84,7 @@ export default function TopicList({ stats, onStart, onReview }: Props) {
   return (
     <section className="space-y-6">
       <div className="card relative overflow-hidden bg-gradient-to-br from-amber-100 via-pink-50 to-sky-100 p-6">
-        <span className="pointer-events-none absolute -right-2 -top-3 text-7xl opacity-90 animate-floaty sm:text-8xl" aria-hidden>
+        <span className="pointer-events-none absolute right-4 top-4 text-6xl leading-none opacity-90 animate-floaty sm:right-6 sm:top-5 sm:text-7xl" aria-hidden>
           {child?.avatar ?? '🐼'}
         </span>
         <h1 className="pr-20 text-3xl font-extrabold text-slate-800 sm:text-4xl">Chào {name}! 👋</h1>
